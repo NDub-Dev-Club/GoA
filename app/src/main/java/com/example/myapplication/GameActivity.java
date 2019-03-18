@@ -8,19 +8,27 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-public class OrderActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
 
     int day = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order);
+        setContentView(R.layout.activity_game);
 
         // Get the intent and its data.
         Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        String message = intent.getStringExtra("Employee");
+        final TextView employee_msg = findViewById(R.id.employeeText);
+        employee_msg.setText(message);
+
+
+
+
+
+
         final TextView textView = findViewById(R.id.textView);
-        textView.setText(message);
+        textView.setText(String.valueOf(day));
 
         Button nextDay = findViewById(R.id.nextDay);
         nextDay.setOnClickListener(new View.OnClickListener() {
