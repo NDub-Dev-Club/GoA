@@ -43,7 +43,8 @@ public class GameActivity extends AppCompatActivity {
         showEmp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(GameActivity.this, EmployeesActivity.class);
+                startActivity(intent);
 
             }
 
