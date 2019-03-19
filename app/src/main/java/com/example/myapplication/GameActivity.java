@@ -8,9 +8,22 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-public class GameActivity extends AppCompatActivity {
+class dialogueNode {
+    String dialogue;
+    choice[] choices;
+}
 
-    int day = 0;
+class choice {
+    String name;
+    int destIndex;
+
+
+}
+
+public class GameActivity extends AppCompatActivity {
+    dialogueNode[] BobsGraph;
+    static int time = 10;
+    static int day = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,24 +31,29 @@ public class GameActivity extends AppCompatActivity {
 
         // Get the intent and its data.
         Intent intent = getIntent();
-        String message = intent.getStringExtra("Employee");
-        final TextView employee_msg = findViewById(R.id.employeeText);
-        employee_msg.setText(message);
+        String employee = intent.getStringExtra("Employee");
+
+        if (employee == "Bob")
+        {
+            time -= 1;
+            final TextView convoText = findViewById(R.id.convoText);
+            convoText.setText("Hello " + employee);
+
+        }
 
 
 
 
-
-
-        final TextView textView = findViewById(R.id.textView);
-        textView.setText(String.valueOf(day));
+        final TextView dayCount = findViewById(R.id.day);
+        dayCount.setText(String.valueOf(day));
 
         Button nextDay = findViewById(R.id.nextDay);
         nextDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 day++;
-                textView.setText(String.valueOf(day));
+                time = 10;
+                dayCount.setText(String.valueOf(day));
             }
         });
 
@@ -50,8 +68,5 @@ public class GameActivity extends AppCompatActivity {
 
         });
     }
-
-
-
 
 }
