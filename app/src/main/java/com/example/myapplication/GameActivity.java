@@ -7,21 +7,37 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.HashMap;
 
-class dialogueNode {
-    String dialogue;
-    choice[] choices;
+class DialogueGraph {
+
+
+    DialogueNode[] data;
+    int currentNode = 0;
+
+    void printDialogue(TextView toPrint)
+    {
+
+        toPrint.setText(data[currentNode].dialogue);
+    }
 }
 
-class choice {
+
+class DialogueNode {
+    String dialogue;
+    Choice[] choices;
+}
+
+class Choice {
     String name;
     int destIndex;
-
+    int cost;
 
 }
 
 public class GameActivity extends AppCompatActivity {
-    dialogueNode[] BobsGraph;
+    static HashMap<String, DialogueGraph> dialogueGraphs = new HashMap<String, DialogueGraph>();
+
     static int time = 10;
     static int day = 0;
     @Override
@@ -29,17 +45,17 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Get the intent and its data.
+
+        dialogueGraphs.put("Bob", new DialogueGraph());
+
         Intent intent = getIntent();
         String employee = intent.getStringExtra("Employee");
 
-        if (employee == "Bob")
-        {
-            time -= 1;
-            final TextView convoText = findViewById(R.id.convoText);
-            convoText.setText("Hello " + employee);
 
-        }
+        TextView convoText = findViewById(R.id.convoText);
+        dialogueGraphs.get(employee).printDialogue(convoText);
+
+
 
 
 
