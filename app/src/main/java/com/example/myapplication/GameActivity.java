@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -47,14 +48,23 @@ public class GameActivity extends AppCompatActivity {
 
 
         dialogueGraphs.put("Bob", new DialogueGraph());
+        dialogueGraphs.get("Bob").data = new DialogueNode[1];
+        dialogueGraphs.get("Bob").data[0] = new DialogueNode();
+        dialogueGraphs.get("Bob").data[0].dialogue = "Bob: Hello.";
+
 
         Intent intent = getIntent();
         String employee = intent.getStringExtra("Employee");
 
 
         TextView convoText = findViewById(R.id.convoText);
-        dialogueGraphs.get(employee).printDialogue(convoText);
 
+        if (!employee.equals("None")) {
+            dialogueGraphs.get(employee).printDialogue(convoText);
+            ConstraintLayout constraintLayout = findViewById(R.id.choices);
+            Button choice = new Button(this);
+            constraintLayout.addView(choice);
+        }
 
 
 
