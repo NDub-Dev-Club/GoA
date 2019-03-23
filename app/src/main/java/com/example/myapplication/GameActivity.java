@@ -3,9 +3,11 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -20,6 +22,32 @@ class DialogueGraph {
     {
 
         toPrint.setText(data[currentNode].dialogue);
+    }
+    void showChoices(final LinearLayout choicesLayout, final TextView convoText, final GameActivity theClass)
+    {
+        int spacing = 0;
+        for (final Choice choice : data[currentNode].choices)
+        {
+
+            Button choiceButton = new Button(theClass);
+            choicesLayout.addView(choiceButton,0);
+
+            choiceButton.setText(choice.name);
+
+            choiceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    choicesLayout.removeAllViews();
+
+                    currentNode = choice.destIndex;
+                    printDialogue(convoText);
+                    showChoices(choicesLayout, convoText, theClass);
+                }
+
+            });
+
+            spacing++;
+        }
     }
 }
 
@@ -48,10 +76,28 @@ public class GameActivity extends AppCompatActivity {
 
 
         dialogueGraphs.put("Bob", new DialogueGraph());
-        dialogueGraphs.get("Bob").data = new DialogueNode[1];
+        dialogueGraphs.get("Bob").data = new DialogueNode[3];
         dialogueGraphs.get("Bob").data[0] = new DialogueNode();
         dialogueGraphs.get("Bob").data[0].dialogue = "Bob: Hello.";
 
+        dialogueGraphs.get("Bob").data[0].choices = new Choice[2];
+        dialogueGraphs.get("Bob").data[0].choices[0] = new Choice();
+        dialogueGraphs.get("Bob").data[0].choices[0].name = "Hello";
+        dialogueGraphs.get("Bob").data[0].choices[0].cost = 1;
+        dialogueGraphs.get("Bob").data[0].choices[0].destIndex = 1;
+
+        dialogueGraphs.get("Bob").data[0].choices[1] = new Choice();
+        dialogueGraphs.get("Bob").data[0].choices[1].name = "How are you";
+        dialogueGraphs.get("Bob").data[0].choices[1].cost = 2;
+        dialogueGraphs.get("Bob").data[0].choices[1].destIndex = 2;
+
+        dialogueGraphs.get("Bob").data[1] = new DialogueNode();
+        dialogueGraphs.get("Bob").data[1].dialogue = "Bob: ok.";
+        dialogueGraphs.get("Bob").data[1].choices = new Choice[0];
+
+        dialogueGraphs.get("Bob").data[2] = new DialogueNode();
+        dialogueGraphs.get("Bob").data[2].dialogue = "Bob: good.";
+        dialogueGraphs.get("Bob").data[2].choices = new Choice[0];
 
         Intent intent = getIntent();
         String employee = intent.getStringExtra("Employee");
@@ -61,9 +107,8 @@ public class GameActivity extends AppCompatActivity {
 
         if (!employee.equals("None")) {
             dialogueGraphs.get(employee).printDialogue(convoText);
-            ConstraintLayout constraintLayout = findViewById(R.id.choices);
-            Button choice = new Button(this);
-            constraintLayout.addView(choice);
+            LinearLayout choicesLayout = findViewById(R.id.choices);
+            dialogueGraphs.get(employee).showChoices(choicesLayout, convoText, this);
         }
 
 
