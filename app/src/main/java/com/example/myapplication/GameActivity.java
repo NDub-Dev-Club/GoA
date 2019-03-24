@@ -12,25 +12,22 @@ import android.widget.TextView;
 
 import java.util.HashMap;
 
-class DialogueGraph {
 
+class CharacterChoices {
+    Choice[] choices;
+    CharacterChoices(Choice...choices) {
 
-    DialogueNode[] data;
-    int currentNode = 0;
+        this.choices = choices;
 
-    void printDialogue(TextView toPrint)
-    {
-
-        toPrint.setText(data[currentNode].dialogue);
     }
-    void showChoices(final LinearLayout choicesLayout, final TextView convoText, final GameActivity theClass)
+    void showChoices(final LinearLayout choicesLayout, final GameActivity theClass)
     {
-        int spacing = 0;
-        for (final Choice choice : data[currentNode].choices)
+
+        for (final Choice choice : choices)
         {
 
             Button choiceButton = new Button(theClass);
-            choicesLayout.addView(choiceButton,0);
+            choicesLayout.addView(choiceButton);
 
             choiceButton.setText(choice.name);
 
@@ -38,34 +35,52 @@ class DialogueGraph {
                 @Override
                 public void onClick(View view) {
                     choicesLayout.removeAllViews();
-
-                    currentNode = choice.destIndex;
-                    printDialogue(convoText);
-                    showChoices(choicesLayout, convoText, theClass);
                 }
 
             });
 
-            spacing++;
+
         }
     }
-}
 
-
-class DialogueNode {
-    String dialogue;
-    Choice[] choices;
 }
 
 class Choice {
+    Choice(String name, int cost, String...dialogue) {
+        this.name = name;
+        this.cost = cost;
+        this.dialogue = dialogue;
+
+    }
+
+    void showDialogue(final TextView convoText) {
+
+        convoText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (current + 1 == dialogue.length) {
+                    showChoices(choicesLayout, theClass);
+                }
+                else {
+                    current++;
+                    convoText.setText(dialogue[current]);
+                }
+            }
+
+        });
+
+
+    }
+    int current;
+    String[] dialogue;
     String name;
-    int destIndex;
     int cost;
 
 }
 
 public class GameActivity extends AppCompatActivity {
-    static HashMap<String, DialogueGraph> dialogueGraphs = new HashMap<String, DialogueGraph>();
+    static HashMap<String, CharacterChoices> characterChoices = new HashMap<String, CharacterChoices>();
 
     static int time = 10;
     static int day = 0;
@@ -75,39 +90,22 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
 
-        dialogueGraphs.put("Bob", new DialogueGraph());
-        dialogueGraphs.get("Bob").data = new DialogueNode[3];
-        dialogueGraphs.get("Bob").data[0] = new DialogueNode();
-        dialogueGraphs.get("Bob").data[0].dialogue = "Bob: Hello.";
+        characterChoices.put("Bob", new CharacterChoices(
+                new Choice("Hello", 1, "Bob: Hello."),
+                new Choice("asdf?", 2, "Bob: qwer."),
+                new Choice("How are you", 2, "Bob: good.")
+        ));
 
-        dialogueGraphs.get("Bob").data[0].choices = new Choice[2];
-        dialogueGraphs.get("Bob").data[0].choices[0] = new Choice();
-        dialogueGraphs.get("Bob").data[0].choices[0].name = "Hello";
-        dialogueGraphs.get("Bob").data[0].choices[0].cost = 1;
-        dialogueGraphs.get("Bob").data[0].choices[0].destIndex = 1;
-
-        dialogueGraphs.get("Bob").data[0].choices[1] = new Choice();
-        dialogueGraphs.get("Bob").data[0].choices[1].name = "How are you";
-        dialogueGraphs.get("Bob").data[0].choices[1].cost = 2;
-        dialogueGraphs.get("Bob").data[0].choices[1].destIndex = 2;
-
-        dialogueGraphs.get("Bob").data[1] = new DialogueNode();
-        dialogueGraphs.get("Bob").data[1].dialogue = "Bob: ok.";
-        dialogueGraphs.get("Bob").data[1].choices = new Choice[0];
-
-        dialogueGraphs.get("Bob").data[2] = new DialogueNode();
-        dialogueGraphs.get("Bob").data[2].dialogue = "Bob: good.";
-        dialogueGraphs.get("Bob").data[2].choices = new Choice[0];
 
         Intent intent = getIntent();
         String employee = intent.getStringExtra("Employee");
 
 
-        TextView convoText = findViewById(R.id.convoText);
-
+        final TextView convoText = findViewById(R.id.convoText);
+        final LinearLayout choicesLayout = findViewById(R.id.choices);
         if (!employee.equals("None")) {
             dialogueGraphs.get(employee).printDialogue(convoText);
-            LinearLayout choicesLayout = findViewById(R.id.choices);
+
             dialogueGraphs.get(employee).showChoices(choicesLayout, convoText, this);
         }
 
@@ -122,6 +120,8 @@ public class GameActivity extends AppCompatActivity {
         nextDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                convoText.setText("");
+                choicesLayout.removeAllViews();
                 day++;
                 time = 10;
                 dayCount.setText(String.valueOf(day));
