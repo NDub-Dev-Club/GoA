@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,
                         GameActivity.class);
-                intent.putExtra("Employee", "None");
+                intent.putExtra("Employee", Employee.NONE);
                 startActivity(intent);
             }
         });

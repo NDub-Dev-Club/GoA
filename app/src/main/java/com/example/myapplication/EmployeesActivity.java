@@ -18,13 +18,14 @@ public class EmployeesActivity extends AppCompatActivity {
 
 
         final Button employee = findViewById(R.id.button);
+        employee.setTag(Employee.BOB);
 
         employee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(EmployeesActivity.this,
                         GameActivity.class);
-                intent.putExtra("Employee", employee.getText());
+                intent.putExtra("Employee", (Employee)employee.getTag());
                 startActivity(intent);
             }
         });

@@ -10,78 +10,138 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 
+enum Employee {
+    NONE,
+    BOB,
 
-class CharacterChoices {
-    Choice[] choices;
-    CharacterChoices(Choice...choices) {
+}
 
-        this.choices = choices;
+
+class ChoiceFinder {
+    ChoiceFinder(Employee charName, int i) {
+        characterName = charName;
+        index = i;
+
 
     }
-    void showChoices(final LinearLayout choicesLayout, final GameActivity theClass)
-    {
 
-        for (final Choice choice : choices)
+    Employee characterName;
+    int index;
+
+}
+
+
+public class GameActivity extends AppCompatActivity {
+
+
+    class CharacterChoices {
+        Choice[] choices;
+        CharacterChoices(Choice...mChoices) {
+
+            choices = mChoices;
+            for (Choice choice : choices) {
+                choice.character = this;
+
+
+            }
+        }
+        void showChoices()
         {
 
-            Button choiceButton = new Button(theClass);
-            choicesLayout.addView(choiceButton);
+            for (final Choice choice : choices)
+            {
+                if (choice.checkUsable()) {
+                    Button choiceButton = new Button(GameActivity.this);
+                    choicesLayout.addView(choiceButton);
 
-            choiceButton.setText(choice.name);
+                    choiceButton.setText(choice.name);
 
-            choiceButton.setOnClickListener(new View.OnClickListener() {
+                    choiceButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            choicesLayout.removeAllViews();
+                            choice.showDialogue();
+                        }
+
+                    });
+                }
+
+            }
+        }
+
+    }
+
+    class Choice {
+        Choice(String name, int cost, String[] dialogue, ChoiceFinder...needed) {
+            this.name = name;
+            this.cost = cost;
+            this.dialogue = dialogue;
+            neededPrev = needed;
+        }
+
+        boolean checkUsable() {
+            if (visited) {
+
+                return false;
+            }
+
+            for (ChoiceFinder needed : neededPrev) {
+                if (!characterChoices.get(needed.characterName).choices[needed.index].visited) {
+                    return false;
+
+                }
+
+            }
+            return true;
+        }
+
+        void showDialogue() {
+            visited = true;
+            nextDay.setEnabled(false);
+            showEmp.setEnabled(false);
+            convoText.setText(dialogue[0]);
+            convoText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    choicesLayout.removeAllViews();
+
+                    if (current == dialogue.length - 1) {
+                        convoText.setText("");
+                        nextDay.setEnabled(true);
+                        showEmp.setEnabled(true);
+                        character.showChoices();
+                    }
+                    else {
+                        current++;
+                        convoText.setText(dialogue[current]);
+
+                    }
                 }
 
             });
 
 
         }
+        CharacterChoices character;
+        ChoiceFinder[] neededPrev;
+        int current;
+        String[] dialogue;
+        String name;
+        int cost;
+        boolean visited = false;
     }
 
-}
-
-class Choice {
-    Choice(String name, int cost, String...dialogue) {
-        this.name = name;
-        this.cost = cost;
-        this.dialogue = dialogue;
-
-    }
-
-    void showDialogue(final TextView convoText) {
-
-        convoText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (current + 1 == dialogue.length) {
-                    showChoices(choicesLayout, theClass);
-                }
-                else {
-                    current++;
-                    convoText.setText(dialogue[current]);
-                }
-            }
-
-        });
 
 
-    }
-    int current;
-    String[] dialogue;
-    String name;
-    int cost;
+    static EnumMap<Employee, CharacterChoices> characterChoices = new EnumMap<>(Employee.class);;
 
-}
 
-public class GameActivity extends AppCompatActivity {
-    static HashMap<String, CharacterChoices> characterChoices = new HashMap<String, CharacterChoices>();
-
+    TextView convoText;
+    LinearLayout choicesLayout;
+    Button nextDay;
+    Button showEmp;
     static int time = 10;
     static int day = 0;
     @Override
@@ -90,33 +150,17 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
 
-        characterChoices.put("Bob", new CharacterChoices(
-                new Choice("Hello", 1, "Bob: Hello."),
-                new Choice("asdf?", 2, "Bob: qwer."),
-                new Choice("How are you", 2, "Bob: good.")
-        ));
-
+        convoText = findViewById(R.id.convoText);
+        choicesLayout = findViewById(R.id.choices);
 
         Intent intent = getIntent();
-        String employee = intent.getStringExtra("Employee");
-
-
-        final TextView convoText = findViewById(R.id.convoText);
-        final LinearLayout choicesLayout = findViewById(R.id.choices);
-        if (!employee.equals("None")) {
-            dialogueGraphs.get(employee).printDialogue(convoText);
-
-            dialogueGraphs.get(employee).showChoices(choicesLayout, convoText, this);
-        }
-
-
-
+        Employee employee = (Employee) intent.getSerializableExtra("Employee");
 
 
         final TextView dayCount = findViewById(R.id.day);
         dayCount.setText(String.valueOf(day));
 
-        Button nextDay = findViewById(R.id.nextDay);
+        nextDay = findViewById(R.id.nextDay);
         nextDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +172,7 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        Button showEmp = findViewById(R.id.showEmp);
+        showEmp = findViewById(R.id.showEmp);
         showEmp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,6 +182,33 @@ public class GameActivity extends AppCompatActivity {
             }
 
         });
+
+        if (employee != Employee.NONE) {
+            characterChoices.get(employee).showChoices();
+        }
+        else {
+            characterChoices.put(Employee.BOB, new CharacterChoices(
+                    new Choice("Hello", 1, new String[]{
+                            "Hello.",
+                            "k"
+                    }
+                    ),
+                    new Choice("asdf?", 2, new String[]{
+                            "qwer.",
+                            "qwerrr."
+                    }
+                    ),
+                    new Choice("How are you", 2, new String[]{
+                            "Good."
+                    },
+                            new ChoiceFinder(Employee.BOB, 1),
+                            new ChoiceFinder(Employee.BOB, 0))
+            ));
+
+        }
+
+
+
     }
 
 }
