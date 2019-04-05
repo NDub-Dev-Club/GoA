@@ -27,7 +27,6 @@ class ChoiceFinder {
 
 
     }
-
     Employee characterName;
     int index;
 
@@ -89,7 +88,9 @@ public class GameActivity extends AppCompatActivity {
             }
 
             for (ChoiceFinder needed : neededPrev) {
+
                 if (!characterChoices.get(needed.characterName).choices[needed.index].visited) {
+
                     return false;
 
                 }
@@ -135,7 +136,7 @@ public class GameActivity extends AppCompatActivity {
 
 
 
-    static EnumMap<Employee, CharacterChoices> characterChoices = new EnumMap<>(Employee.class);;
+    static EnumMap<Employee, CharacterChoices> characterChoices = new EnumMap<>(Employee.class);
 
 
     TextView convoText;
@@ -150,11 +151,24 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
 
+        /*
+        File directory;
+if (filename.isEmpty()) {
+    directory = getFilesDir();
+}
+else {
+    directory = getDir(filename, MODE_PRIVATE);
+}
+File[] files = directory.listFiles();
+
+
+         */
+
         convoText = findViewById(R.id.convoText);
         choicesLayout = findViewById(R.id.choices);
 
-        Intent intent = getIntent();
-        Employee employee = (Employee) intent.getSerializableExtra("Employee");
+
+        Employee employee;
 
 
         final TextView dayCount = findViewById(R.id.day);
@@ -176,18 +190,36 @@ public class GameActivity extends AppCompatActivity {
         showEmp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(GameActivity.this, EmployeesActivity.class);
-                startActivity(intent);
+
+
+
+
+                final Button employeeButton = findViewById(R.id.button);
+                employeeButton.setTag(Employee.BOB);
+
+                employeeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        employee = (Employee)employeeButton.getTag();
+
+                    }
+                });
+
+
 
             }
 
         });
 
         if (employee != Employee.NONE) {
+
             characterChoices.get(employee).showChoices();
+
         }
         else {
             characterChoices.put(Employee.BOB, new CharacterChoices(
+
                     new Choice("Hello", 1, new String[]{
                             "Hello.",
                             "k"
