@@ -61,8 +61,16 @@ public class GameActivity extends AppCompatActivity {
                     choiceButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            choicesLayout.removeAllViews();
-                            choice.showDialogue();
+                            if (time < choice.cost)
+                            {
+                                //can't press choice
+                            }
+                            else {
+                                time -= choice.cost;
+                                timeLeft.setText(String.valueOf(time));
+                                choicesLayout.removeAllViews();
+                                choice.showDialogue();
+                            }
                         }
 
                     });
@@ -141,6 +149,7 @@ public class GameActivity extends AppCompatActivity {
 
     TextView convoText;
     LinearLayout choicesLayout;
+    TextView timeLeft;
     Button nextDay;
     Button showEmp;
     static int time = 10;
@@ -168,7 +177,7 @@ File[] files = directory.listFiles();
         choicesLayout = findViewById(R.id.choices);
 
 
-        Employee employee;
+        timeLeft = findViewById(R.id.timeLeft);
 
 
         final TextView dayCount = findViewById(R.id.day);
@@ -182,6 +191,7 @@ File[] files = directory.listFiles();
                 choicesLayout.removeAllViews();
                 day++;
                 time = 10;
+                timeLeft.setText(String.valueOf(time));
                 dayCount.setText(String.valueOf(day));
             }
         });
@@ -194,50 +204,63 @@ File[] files = directory.listFiles();
 
 
 
-                final Button employeeButton = findViewById(R.id.button);
-                employeeButton.setTag(Employee.BOB);
-
-                employeeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        employee = (Employee)employeeButton.getTag();
-
-                    }
-                });
 
 
+
+                final Button[] employeeBs = new Button[]{
+                        new Button(GameActivity.this),
+
+
+                };
+
+                employeeBs[0].setTag(Employee.BOB);
+                employeeBs[0].setText("Bob");
+                for (final Button employeeB : employeeBs) {
+
+                    choicesLayout.addView(employeeB);
+
+                    employeeB.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if ((Employee) employeeB.getTag() != Employee.NONE) {
+                                choicesLayout.removeAllViews();
+                                characterChoices.get((Employee) employeeB.getTag()).showChoices();
+
+                            }
+
+
+                        }
+
+                    });
+
+                }
 
             }
 
         });
 
-        if (employee != Employee.NONE) {
 
-            characterChoices.get(employee).showChoices();
 
-        }
-        else {
-            characterChoices.put(Employee.BOB, new CharacterChoices(
+        characterChoices.put(Employee.BOB, new CharacterChoices(
 
-                    new Choice("Hello", 1, new String[]{
-                            "Hello.",
-                            "k"
-                    }
-                    ),
-                    new Choice("asdf?", 2, new String[]{
-                            "qwer.",
-                            "qwerrr."
-                    }
-                    ),
-                    new Choice("How are you", 2, new String[]{
-                            "Good."
-                    },
-                            new ChoiceFinder(Employee.BOB, 1),
-                            new ChoiceFinder(Employee.BOB, 0))
-            ));
+                new Choice("Hello", 1, new String[]{
+                        "Hello.",
+                        "k"
+                }
+                ),
+                new Choice("asdf?", 2, new String[]{
+                        "qwer.",
+                        "qwerrr."
+                }
+                ),
+                new Choice("How are you", 2, new String[]{
+                        "Good."
+                },
+                        new ChoiceFinder(Employee.BOB, 1),
+                        new ChoiceFinder(Employee.BOB, 0))
+        ));
 
-        }
+
 
 
 
