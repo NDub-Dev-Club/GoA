@@ -37,9 +37,11 @@ public class GameActivity extends AppCompatActivity {
 
 
     class CharacterChoices {
-        Choice[] choices;
-        CharacterChoices(Choice...mChoices) {
 
+        Choice[] choices;
+        int moneyChange;
+        CharacterChoices(int moneyChange, Choice...mChoices) {
+            this.moneyChange = moneyChange;
             choices = mChoices;
             for (Choice choice : choices) {
                 choice.character = this;
@@ -154,6 +156,7 @@ public class GameActivity extends AppCompatActivity {
     Button showEmp;
     static int time = 10;
     static int day = 0;
+    static int money = 1_000_000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,13 +165,13 @@ public class GameActivity extends AppCompatActivity {
 
         /*
         File directory;
-if (filename.isEmpty()) {
-    directory = getFilesDir();
-}
-else {
-    directory = getDir(filename, MODE_PRIVATE);
-}
-File[] files = directory.listFiles();
+        if (filename.isEmpty()) {
+            directory = getFilesDir();
+        }
+        else {
+            directory = getDir(filename, MODE_PRIVATE);
+        }
+        File[] files = directory.listFiles();
 
 
          */
@@ -187,6 +190,11 @@ File[] files = directory.listFiles();
         nextDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                for (Employee e : characterChoices.keySet())
+                {
+                    money += characterChoices.get(e).moneyChange;
+
+                }
                 convoText.setText("");
                 choicesLayout.removeAllViews();
                 day++;
@@ -242,7 +250,7 @@ File[] files = directory.listFiles();
 
 
         characterChoices.put(Employee.BOB, new CharacterChoices(
-
+                70,
                 new Choice("Hello", 1, new String[]{
                         "Hello.",
                         "k"
