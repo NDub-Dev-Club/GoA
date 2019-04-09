@@ -7,6 +7,7 @@ import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -201,6 +202,8 @@ public class GameActivity extends AppCompatActivity {
                 time = 10;
                 timeLeft.setText(String.valueOf(time));
                 dayCount.setText(String.valueOf(day));
+                ImageView background = findViewById(R.id.imageView);
+                background.setImageResource(R.drawable.room);
             }
         });
 
@@ -233,7 +236,8 @@ public class GameActivity extends AppCompatActivity {
                             if ((Employee) employeeB.getTag() != Employee.NONE) {
                                 choicesLayout.removeAllViews();
                                 characterChoices.get((Employee) employeeB.getTag()).showChoices();
-
+                                ImageView background = findViewById(R.id.imageView);
+                                background.setImageResource(R.drawable.chad);
                             }
 
 
